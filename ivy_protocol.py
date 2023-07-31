@@ -9,7 +9,7 @@ from ivy.ivy import IvyServer, IvyApplicationDisconnected, IvyApplicationConnect
 
 class IvyProtocol(AbstractProtocol):
     
-    def __init__(self,args,logger,com,queue):
+    def __init__(self,args,logger,com,ivy2):
         self.is_initialized = False
         self.args = args
         self.send_end = ""
@@ -21,7 +21,7 @@ class IvyProtocol(AbstractProtocol):
         self.com = com
         self.client=""
         self.total=0
-        self.queue=queue
+        self.ivy2=ivy2
         self.ivybus=None
     
     
@@ -87,9 +87,9 @@ class IvyProtocol(AbstractProtocol):
     # binding on dedicated message : starting with 'hello ...'
     # binding to every message
             
-            if self.com == "PUB":
+            if self.com == "SUB":
                 sleep(1)
-                self.ivybus.bind_msg(self.onmsgprocready, 'ready(.*)')
+                self.ivy2.send_ready()
 
             self.is_initialized = True
             

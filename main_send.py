@@ -25,18 +25,18 @@ def callback_ready(agent, *larg):
 
 def main_send(protocol, message_count, port,length, queue, logger, traitement, flag, flag_count, nbr_processes, direct_msg, device):
 
-        
-    
-    
 
     com = "PUB"
+    
+    ivy = AbstractProtocol()
+    ivy.ivy_secondaire(args, com, None, callback_ready)
     if protocol == 'ivy':
         args = port
         if direct_msg:
             protocol_obj = IvyDirectProtocol(args,logger,com)
             protocol_obj.initialize()
         else:
-            protocol_obj = IvyProtocol(args,logger,com,queue)
+            protocol_obj = IvyProtocol(args,logger,com,ivy)
             protocol_obj.initialize()
 
     elif protocol == 'zeromq':
@@ -57,8 +57,6 @@ def main_send(protocol, message_count, port,length, queue, logger, traitement, f
     
     
     logger.info('Démarrage du sender')
-    abstract = AbstractProtocol()
-    abstract.ivy_secondaire(args, com, None, callback_ready)
     recvrdy=""
     count = 0
     while(count < (nbr_processes) ):

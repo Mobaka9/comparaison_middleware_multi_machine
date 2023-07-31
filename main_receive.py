@@ -19,8 +19,11 @@ def main_receive(protocol, message_count, port, length, queue, logger, flag, nmb
     
     
     com = "SUB"
+    
+    ivy_receive = AbstractProtocol()
+    ivy_receive.ivy_secondaire(port, com, nmbre_rec, None)
     if protocol == 'ivy':
-        protocol_obj = IvyProtocol(port, logger, com,None)
+        protocol_obj = IvyProtocol(port, logger, com,ivy_receive)
         protocol_obj.initialize()
     elif protocol == 'zeromq':
         port = int(port)
@@ -39,7 +42,6 @@ def main_receive(protocol, message_count, port, length, queue, logger, flag, nmb
 
     logger.info('Démarrage du receveur')    
 
-    ivy_secondaire(self, args, com, id_rec, callback_ready)
 
         
         

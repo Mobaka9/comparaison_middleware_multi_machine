@@ -6,6 +6,7 @@ class AbstractProtocol(ABC):
     def __init__(self):
         self.ivybus2= None
         self.IVYAPPNAME=""
+        self.allow_send = False
 
     @abstractmethod
     def initialize(self):
@@ -42,8 +43,9 @@ class AbstractProtocol(ABC):
                 #lprint('Ivy application %r was disconnected', agent)
                 if self.com == "SUB":
                     if "sender" in agent:
-                        pass
+                        self.allow_send = True
             elif event_type == IvyApplicationConnected:
+                callback_ready()
                 lprint('Ivy application %r was connected', agent)
 
             lprint('currents Ivy application are [%s]', self.ivybus2.get_clients())
@@ -67,8 +69,10 @@ class AbstractProtocol(ABC):
 
         self.ivybus2.start(sivybus)
             
-        if self.com=="SUB":
+        if self.com=="PUB":
             self.ivybus2.bind_msg(callback_ready,'ready(.*)')
     
     def send_ready(self):
+        while self.allow_send != True:
+            pass
         self.ivybus2.send_msg(f"ready :{self.IVYAPPNAME}")

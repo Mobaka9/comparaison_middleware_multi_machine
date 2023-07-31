@@ -36,13 +36,11 @@ class MessageReceiver:
         plt.close()  # Ferme la figure pour libérer les ressources
 
         
-    def receive_messages(self, message_count, queue, flag,nmbre_rec,total_rec, multi_rec,direct_msg):
+    def receive_messages(self, message_count, queue, flag,nmbre_rec,total_rec, multi_rec,direct_msg,ivy_receive):
             self.data = self.protocol_obj.receive_message(message_count,queue,total_rec,direct_msg,flag)
             self.protocol_obj.stopsocket()
             print(self.data)
             print(len(self.data))
-            abstract_receive = AbstractProtocol()
-            abstract_receive.ivy_secondaire(args, com, None, callback_ready)
 
             if(flag):
                 if self.protocol != "ivy":
