@@ -6,6 +6,8 @@ import time
 import matplotlib.pyplot as plt
 from statistics import mean
 import ivy.ivy
+from abstract_protocol import AbstractProtocol
+
 
 
 class MessageReceiver:
@@ -39,6 +41,8 @@ class MessageReceiver:
             self.protocol_obj.stopsocket()
             print(self.data)
             print(len(self.data))
+            abstract_receive = AbstractProtocol()
+            abstract_receive.ivy_secondaire(args, com, None, callback_ready)
 
             if(flag):
                 if self.protocol != "ivy":
@@ -109,54 +113,4 @@ class MessageReceiver:
 
                 self.draw_graph(self.bus, message_count, multi_rec) 
 
-    def init_ivy(self,resultat):
-        
-            IVYAPPNAME="Result_sender"
-            sivybus = ''
-            sisreadymsg = f"ready {IVYAPPNAME}"                              
-            def lprint(fmt, *arg):
-
-                print(fmt % arg)
-
-                
-            def usage(scmd):
-                lpathitem = string.split(scmd, '/')
-                fmt = '''Usage: %s [-h] [-b IVYBUS | --ivybus=IVYBUS]
-                where
-                \t-h provides the usage message;
-                \t-b IVYBUS | --ivybus=IVYBUS allow to provide the IVYBUS string in the form
-                \t adresse:port eg. 127.255.255.255:2010
-                '''
-                print(fmt % lpathitem[-1])
-            
-            def oncxproc(agent, event_type):
-                if event_type == IvyApplicationDisconnected:
-                    lprint('Ivy application %r was disconnected', agent)
-                else:
-                    lprint('Ivy application %r was connected', agent)
-
-                lprint('currents Ivy application are [%s]', IvyGetApplicationList())
-
-
-            def ondieproc(agent, _id):
-                lprint('received the order to die from %r with id = %d', agent, _id)
-
-                    
-            
-            broadcast = self.args.split(":")
-            port1=int(broadcast[1])
-            sechoivybus = broadcast[0]+":"+str(port1+1)
-            
-            lprint('Ivy will broadcast on %s ', sechoivybus)
-
-                # initialising the bus
-            IvyInit(IVYAPPNAME,     # application name for Ivy
-                    sisreadymsg,    # ready message
-                    0,              # main loop is local (ie. using IvyMainloop)
-                    oncxproc,       # handler called on connection/disconnection
-                    ondieproc)      # handler called when a <die> message is received
-            IvyStart(sechoivybus)
-            sleep(2)
-            IvySendMsg
-            (resultat)
-                
+    
