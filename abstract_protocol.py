@@ -1,78 +1,83 @@
+import json
+import logging
 from abc import ABC, abstractmethod
+from time import sleep
+
 from ivy.ivy import IvyServer, IvyApplicationDisconnected, IvyApplicationConnected
 
 
 class AbstractProtocol(ABC):
-    def __init__(self):
-        self.ivybus2= None
-        self.IVYAPPNAME=""
-        self.allow_send = False
+    def __init__(self, ivybus_test_manager, com, id_rec=''):
+        if com == "PUB":
+            IVYAPPNAME = "Sender_secondaire"
+        else:
+            IVYAPPNAME = f"Receiver_{id_rec}_secondaire"
+
+        sisreadymsg = f"ready {IVYAPPNAME}"
+        self.receivers_count = 0
+        self.results = []
+        self.results_received = 0
+
+        def oncxproc(agent, event_type):
+            if event_type == IvyApplicationDisconnected:
+                if "Receiver" in str(agent):
+                    self.receivers_count = self.receivers_count - 1
+            elif event_type == IvyApplicationConnected:
+                if "Receiver" in str(agent):
+                    self.receivers_count = self.receivers_count + 1
+
+            # print('currents Ivy application are [%s]', self.ivybus2.get_clients())
+
+        def ondieproc(agent, _id):
+            print('received the order to die from %r with id = %d', agent, _id)
+            self.stopsocket()
+
+        def on_results(agent, data):
+            self.results_received += 1
+            self.results.append(json.loads(data.replace("'", '"')))
+            # print(f"results received: {self.results}")
+
+        self.ivybus_test_manager = IvyServer(IVYAPPNAME,  # application name for Ivy
+                                             sisreadymsg,  # ready message
+                                             oncxproc,  # handler called on connection/disconnection
+                                             ondieproc)
+
+        self.ivybus_test_manager.bind_msg(on_results, 'RESULTS=(.*)')
+        self.ivybus_test_manager.start(ivybus_test_manager)
+
+    def wait_for_all_receivers(self, count):
+        while self.receivers_count != count:
+            logging.error(f"wait_for_all_receivers({self.receivers_count}, {count})")
+            sleep(0.1)
+
+
+    def wait_for_all_results(self, count):
+        while self.results_received != count:
+            print(f"Sender wait for results: {len(self.results)}")
+            sleep(0.1)
+        return self.results
+
+    def send_results(self, results):
+        self.ivybus_test_manager.send_msg(f"RESULTS={results}")
+
+    def test_manager_stop(self):
+        self.ivybus_test_manager.stop()
 
     @abstractmethod
     def initialize(self):
         pass
 
     @abstractmethod
-    def send_message(self, message, topic):
+    def send_message(self, message):
         pass
 
     @abstractmethod
-    def receive_message(self):
-        pass 
-    
+    def receive_messages(self, message_count, flag_count):
+        pass
+
     @abstractmethod
     def stopsocket(self):
         pass
-    
-    def ivy_secondaire(self, args, com, id_rec, callback_ready):
-        if com == "PUB":
-            self.IVYAPPNAME = f"Sender_secondaire"
-        else:
-            self.IVYAPPNAME = f"Receiver_{id_rec}_secondaire"
 
-        sivybus = ''
-        sisreadymsg = f"ready {self.IVYAPPNAME}"                              
-        def lprint(fmt, *arg):
-
-            print(self.IVYAPPNAME + ': ' + fmt % arg)
-
-
-        
-        def oncxproc(agent, event_type):
-            if event_type == IvyApplicationDisconnected:
-                #lprint('Ivy application %r was disconnected', agent)
-                if self.com == "SUB":
-                    if "sender" in agent:
-                        self.allow_send = True
-            elif event_type == IvyApplicationConnected:
-                callback_ready()
-                lprint('Ivy application %r was connected', agent)
-
-            lprint('currents Ivy application are [%s]', self.ivybus2.get_clients())
-
-
-        def ondieproc(agent, _id):
-            lprint('received the order to die from %r with id = %d', agent, _id)
-
-                
-
-        broadcast = args.split(":")
-        port1=int(broadcast[1])
-        sivybus = broadcast[0]+":"+str(port1+1)
-        lprint('Ivy will broadcast on %s ', sivybus)
-
-            # initialising the bus
-        self.ivybus2 = IvyServer(self.IVYAPPNAME,     # application name for Ivy
-                                sisreadymsg,    # ready message              
-                                oncxproc,       # handler called on connection/disconnection
-                                ondieproc)
-
-        self.ivybus2.start(sivybus)
-            
-        if self.com=="PUB":
-            self.ivybus2.bind_msg(callback_ready,'ready(.*)')
-    
-    def send_ready(self):
-        while self.allow_send != True:
-            pass
-        self.ivybus2.send_msg(f"ready :{self.IVYAPPNAME}")
+    # def send_ready(self):
+    #     self.ivybus2.send_msg(f"ready :{self.IVYAPPNAME}")

@@ -106,7 +106,7 @@ class IvyDirectProtocol(AbstractProtocol):
         
     
             
-    def receive_message(self,message_count,queue,total_rec,direct_msg,flag):
+    def receive_messages(self,message_count,queue,total_rec,direct_msg,flag):
         
         IvyBindDirectMsg(self.onmsgproc)
        
@@ -118,7 +118,7 @@ class IvyDirectProtocol(AbstractProtocol):
             self.send_end = queue.get()
             print(self.send_end)
 
-        if not direct_msg:
+        if not direct_msg: #TODO: NOT DIRECT alors qu'on est dans la classe ivy direct??
             if self.pop_hello:
                 self.plt_data= self.plt_data[total_rec:]
         return self.plt_data
