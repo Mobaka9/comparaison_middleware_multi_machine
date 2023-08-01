@@ -13,19 +13,19 @@ from ivy.ivy import IvyServer, IvyApplicationDisconnected, IvyApplicationConnect
 class IvyProtocol(AbstractProtocol):
 
     def __init__(self, port, com, client_id, ivybus_test_manager):
-        AbstractProtocol.__init__(self, ivybus_test_manager, com)
+        AbstractProtocol.__init__(self, ivybus_test_manager, com, client_id)
         self.is_initialized = False
         self.send_end = ""
         self.last_received_msg_id = 0
         self.plt_data = []
-        self.durations = []
+
         self.wait = True
         self.com = com
         self.client = ""
         self.total = 0
         self.ivybus = None
         self.port = port
-        self.client_id = client_id
+
 
     def initialize(self):
 

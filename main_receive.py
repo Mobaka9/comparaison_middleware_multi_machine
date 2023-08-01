@@ -23,7 +23,7 @@ def main_receive(protocol, message_count, port, regexp_match_count, recv_id, ivy
     elif protocol == 'zeromq':
         port = int(port)
         # port +=1
-        protocol_obj = ZeroMQProtocol(port, com, ivybus_test_manager)
+        protocol_obj = ZeroMQProtocol(port, com, recv_id, ivybus_test_manager)
         protocol_obj.initialize()
     # elif protocol == 'kafka':
     #     protocol_obj = KafkaProtocol(com)

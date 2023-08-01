@@ -5,14 +5,14 @@ from time import sleep
 
 
 class ZeroMQProtocol(AbstractProtocol):
-    def __init__(self, port, com, ivybus_test_manager):
-        AbstractProtocol.__init__(self, ivybus_test_manager, com)
+    def __init__(self, port, com, client_id, ivybus_test_manager):
+        AbstractProtocol.__init__(self, ivybus_test_manager, com, client_id)
         self.port = port
         self.socket = None
         self.context = None
         self.com = com
         self.plt_data = []
-        self.id = 0
+        self.last_received_msg_id = 0
         self.send_end = ""
         self.socket_test = None
         self.topic = "10001"
@@ -45,7 +45,7 @@ class ZeroMQProtocol(AbstractProtocol):
         self.socket.setsockopt_string(zmq.SUBSCRIBE, topicfilter)
         self.socket.setsockopt_string(zmq.SUBSCRIBE, "10002")
 
-        for i in range(message_count):
+        for _ in range(message_count):
             # print(i)
             string = self.socket.recv()
             t1 = time.time()
@@ -55,15 +55,22 @@ class ZeroMQProtocol(AbstractProtocol):
 
             #TODO: Il faut mettre le regexp match ici
 
+            self.durations.append({"msg_id": self.last_received_msg_id,
+                                   "start_time": float(messagedata.split("start_time=")[1]),
+                                   "end_time": t1,
+                                   "duration": (t1 - float(messagedata.split("start_time=")[1])),
+                                   "recv_id": self.client_id
+                                   })
+
             # if topic == "10001" :
-            self.id += 1
-            tmp = [self.id, messagedata, t1]
+            self.last_received_msg_id += 1
+            tmp = [self.last_received_msg_id, messagedata, t1]
             self.plt_data.append(tmp)
 
         # while (self.send_end != "LAST_MESSAGE"):
         #     self.send_end = queue.get()
 
-        return (self.plt_data)
+        return self.durations
 
     def stopsocket(self):
         try:

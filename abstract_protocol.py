@@ -16,6 +16,8 @@ class AbstractProtocol(ABC):
         sisreadymsg = f"ready {IVYAPPNAME}"
         self.receivers_count = 0
         self.results = []
+        self.durations = []
+        self.client_id = id_rec
         self.results_received = 0
 
         def oncxproc(agent, event_type):

@@ -33,7 +33,7 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     elif protocol == 'zeromq':
         port = int(port)
         # port+=1
-        protocol_obj = ZeroMQProtocol(port, com, ivybus_test_manager)
+        protocol_obj = ZeroMQProtocol(port, com, 'send', ivybus_test_manager)
         protocol_obj.initialize()
     # elif protocol == 'kafka':
     #     protocol_obj = KafkaProtocol(com,logger)
