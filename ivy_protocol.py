@@ -37,8 +37,8 @@ class IvyProtocol(AbstractProtocol):
             IVYAPPNAME = f'Receiver_{self.client_id}'
 
         sivybus = ''
-        sisreadymsg = f"ready {IVYAPPNAME}"
-
+        #sisreadymsg = f"ready {IVYAPPNAME}"
+        sisreadymsg=''
         def lprint(fmt, *arg):
 
             print(IVYAPPNAME + ': ' + fmt % arg)

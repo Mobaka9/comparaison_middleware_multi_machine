@@ -1,16 +1,24 @@
 import argparse
 import logging
+import multiprocessing
 
 #from ingescape_protocol import IngescapeProtocol
 from zeromq_protocol import ZeroMQProtocol
 from ivy_protocol import IvyProtocol
 from message_analyzer import MessageReceiver
-
 from time import sleep
 
 count = 0
 
+def start_receivers(protocol, message_count, port, regexp_match_count, nmbre_rec, ivybus_test_manager):
+    recv_processes = []
+    for i in range(nmbre_rec):
+        receive_process = multiprocessing.Process(target=main_receive, args=(
+            protocol, message_count, port, regexp_match_count, i, ivybus_test_manager))
+        recv_processes.append(receive_process)
+        recv_processes[i].start()
 
+    return recv_processes
 def main_receive(protocol, message_count, port, regexp_match_count, recv_id, ivybus_test_manager):
     #    protocol, message_count, port, length, flag, i,
     #    nmbre_rec, multi_recv, direct_msg, device
@@ -60,6 +68,7 @@ if __name__ == '__main__':
     parser.add_argument('--log_level', default='FATAL', help='Niveau de configuration de la journalisation')
     # parser.add_argument('--device', default=None, help='nom du peripherique réseau utilisé pour ingescape')
     parser.add_argument('--ivybus_test_manager', help='ivy bus pour la synchro des tests')
+    parser.add_argument('--nbr_receivers', default=1, type=int, help='Nombre de receveurs créés')
 
 
     param = parser.parse_args()
@@ -73,5 +82,7 @@ if __name__ == '__main__':
             logging.FileHandler('app.log', mode='w')
         ]
     )
-
-    main_receive(param.protocol, param.message_count, param.port, param.flag_count, param.client_id, param.ivybus_test_manager)
+    recv_procs = start_receivers(param.protocol, param.message_count, param.port, param.flag_count, param.nbr_receivers, param.ivybus_test_manager)
+    # main_receive(param.protocol, param.message_count, param.port, param.flag_count, param.client_id, param.ivybus_test_manager)
+    for proc in recv_procs:
+            proc.join()
