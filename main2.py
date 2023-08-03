@@ -3,7 +3,8 @@ import logging
 import multiprocessing
 from main_send import main_send
 from main_receive import main_receive
-from pypdsh.pypdsh import run, gen_ip
+from pypdsh.pypdsh import run
+import threading
 
 
 
@@ -28,6 +29,7 @@ def start_sender_and_wait(protocol, message_count, port, length, sleep, flag_cou
 
 def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_msg, device,
          sleep, ivybus_test_manager, hosts, usernames):
+    threads = []
     if len(hosts) > len(usernames):
         print("nombre de usernames insuffisant")
         return
@@ -35,9 +37,23 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
         print("nombre de hosts insuffisant")
         return
     logging.info('Démarrage du programme')
-    for i in range(nmbre_rec):
-        run(hosts[i%(len(hosts))],usernames[i%(len(hosts))],"bakati",
-            [f"python3 Documents/comparaison_middleware_multi_machine/main_receive.py --protocol ivy --port 10.34.127.255:2422 --message_count 10 --nbr_receivers 3 "])
+    if nmbre_rec > len(hosts):
+        rec_par_hote= int(nmbre_rec/len(hosts))
+        last_host = rec_par_hote + (nmbre_rec%len(hosts))
+        nbr_hosts=len(hosts)
+    else:
+        nbr_hosts= nmbre_rec
+        rec_par_hote=1
+    
+    #for i in range(nmbre_rec):
+     #   print(f"host {hosts[i%(len(hosts))]} user: {usernames[i%(len(hosts))]}")
+    for i in range(nbr_hosts):
+        command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote}"
+        t=threading.Thread(target=run,args=(hosts[0],usernames[0],"bakati", [command]))
+        threads.append(t)
+        threads[i].start()
+    # run(hosts[0],usernames[0],"bakati",
+    #     [f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol ivy --port 10.34.127.255:3322 --message_count 10 --nbr_receivers 3"])
     start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
                             device, ivybus_test_manager)
     

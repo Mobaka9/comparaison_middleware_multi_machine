@@ -67,7 +67,7 @@ if __name__ == '__main__':
     parser.add_argument('--port', help='Port ou addresse (seulement pour ivy)') #TODO: pourquoi seulement pour IVY alors que ZMQ l'utilise ?
     parser.add_argument('--log_level', default='FATAL', help='Niveau de configuration de la journalisation')
     # parser.add_argument('--device', default=None, help='nom du peripherique réseau utilisé pour ingescape')
-    parser.add_argument('--ivybus_test_manager',, default='10.34.127.255:1111', help='ivy bus pour la synchro des tests')
+    parser.add_argument('--ivybus_test_manager', default='10.34.127.255:1111', help='ivy bus pour la synchro des tests')
     parser.add_argument('--nbr_receivers', default=1, type=int, help='Nombre de receveurs créés')
 
 
