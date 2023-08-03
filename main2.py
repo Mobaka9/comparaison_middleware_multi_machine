@@ -37,7 +37,7 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
     logging.info('Démarrage du programme')
     for i in range(nmbre_rec):
         run(hosts[i%(len(hosts))],usernames[i%(len(hosts))],"bakati",
-            ["python3 Documents/dev/comparaison_middleware_multi_machine/main_receive.py --protocol ivy --port 10.34.127.255:2421 --message_count 10 --nbr_receivers 3 "])
+            [f"python3 Documents/comparaison_middleware_multi_machine/main_receive.py --protocol ivy --port 10.34.127.255:2422 --message_count 10 --nbr_receivers 3 "])
     start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
                             device, ivybus_test_manager)
     

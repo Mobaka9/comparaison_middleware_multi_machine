@@ -8,7 +8,6 @@ from ivy_protocol import IvyProtocol
 from message_analyzer import MessageReceiver
 from time import sleep
 
-count = 0
 
 def start_receivers(protocol, message_count, port, regexp_match_count, nmbre_rec, ivybus_test_manager):
     recv_processes = []
@@ -19,6 +18,7 @@ def start_receivers(protocol, message_count, port, regexp_match_count, nmbre_rec
         recv_processes[i].start()
 
     return recv_processes
+
 def main_receive(protocol, message_count, port, regexp_match_count, recv_id, ivybus_test_manager):
     #    protocol, message_count, port, length, flag, i,
     #    nmbre_rec, multi_recv, direct_msg, device
