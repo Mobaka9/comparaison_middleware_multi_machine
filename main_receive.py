@@ -36,7 +36,8 @@ def main_receive(protocol, message_count, port, regexp_match_count, recv_id, ivy
         return
 
     logging.info('Démarrage du receveur')
-
+    #protocol_obj.send_ready_message()
+    print("after send")
     # receiver = MessageReceiver(protocol_obj, protocol)
     results = protocol_obj.receive_messages(message_count, regexp_match_count)
     logging.warning(f"Recv #{recv_id} All messages received, sending results...")

@@ -40,7 +40,6 @@ class ZeroMQProtocol(AbstractProtocol):
 
     def receive_messages(self, message_count, flag_count):
         # initialisation
-
         topicfilter = "10001"
         self.socket.setsockopt_string(zmq.SUBSCRIBE, topicfilter)
         self.socket.setsockopt_string(zmq.SUBSCRIBE, "10002")

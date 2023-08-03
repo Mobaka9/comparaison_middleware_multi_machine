@@ -25,6 +25,7 @@ class IvyProtocol(AbstractProtocol):
         self.total = 0
         self.ivybus = None
         self.port = port
+        
 
 
     def initialize(self):
@@ -33,7 +34,7 @@ class IvyProtocol(AbstractProtocol):
             IVYAPPNAME = 'Sender'
 
         else:
-            IVYAPPNAME = 'Receiver'
+            IVYAPPNAME = f'Receiver_{self.client_id}'
 
         sivybus = ''
         sisreadymsg = f"ready {IVYAPPNAME}"
@@ -54,17 +55,11 @@ class IvyProtocol(AbstractProtocol):
 
         def oncxproc(agent, event_type):
             pass
-            #print("in callback")
+            # print("in callback")
             # if event_type == IvyApplicationDisconnected:
-            #     # lprint('Ivy application %r was disconnected', agent)
-            #     if self.com == "PUB":
-            #         self.queue.put(f"close_sock {agent}")
+            #     lprint('Ivy application %r was disconnected', agent)
             # elif event_type == IvyApplicationConnected:
-            #     # lprint('Ivy application %r was connected', agent)
-            #     if self.com == "PUB":
-            #         str_ready = "RECEIVER_READY " + str(agent)
-            #         print(f"ok test entre {str_ready}")
-            #         self.queue.put(str_ready)
+            #     lprint('Ivy application %r was connected', agent)
             # lprint('currents Ivy application are [%s]', self.ivybus.get_clients())
 
         def ondieproc(agent, _id):
@@ -109,16 +104,18 @@ class IvyProtocol(AbstractProtocol):
     def onmsgprocbind(self, agent, *larg):
         # self.lprint('Received from %r: [%s] ', agent, larg[1])
         t1 = time.time()
-        tmp = [self.last_received_msg_id, larg[0], t1]
-        print(tmp)
-        self.plt_data.append(tmp)
+        data = float(larg[0].split("start_time=")[1])
+        self.durations.append({"msg_id": self.last_received_msg_id,
+                                   "start_time": data,
+                                   "end_time": t1,
+                                   "duration": (t1 - data),
+                                   "recv_id": self.client_id
+                                   })
+        logging.error(f"client {self.client_id} message #{self.last_received_msg_id} received at {t1}")
         self.last_received_msg_id += 1
 
     def onmsgproc2(self, agent, *larg):
         t1 = time.time()
-        # self.msg = larg[self.last_received_msg_id]
-        # tmp = [self.last_received_msg_id, larg[:50], t1, larg[-1]]
-        # self.plt_data.append(tmp)
         self.durations.append({"msg_id" : self.last_received_msg_id,
                                "start_time" : float(larg[-1]),
                                "end_time": t1,
@@ -134,9 +131,9 @@ class IvyProtocol(AbstractProtocol):
             regexp = ' '.join(f"flag{i}=(\\S*)" for i in range(flag_count)) + " start_time=(\\S*)"
             self.ivybus.bind_msg(self.onmsgproc2, regexp)
         else:
-            #TODO: pourquoi 2 binding ici
-            self.ivybus.bind_msg(self.onmsgprocbind, 'hello(.*)')
-            self.ivybus.bind_msg(self.onmsgprocbind, 'bonjour(.*)')
+            self.ivybus.bind_msg(self.onmsgprocbind, '(.*)')
+            #self.ivybus.bind_msg(self.onmsgprocbind, 'bonjour(.*)')
+        self.send_ready_message()
 
         # sleep(2)
 

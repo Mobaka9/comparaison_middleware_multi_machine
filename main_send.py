@@ -9,12 +9,7 @@ from ivy_protocol import IvyProtocol
 from zeromq_protocol import ZeroMQProtocol
 from time import sleep
 
-count = 0
 
-
-def callback_ready(agent, *larg):
-    global count
-    count += 1
 
 
 def main_send(protocol, message_count, port, length, sender_sleep_duration, flag_count, nbr_receivers,
