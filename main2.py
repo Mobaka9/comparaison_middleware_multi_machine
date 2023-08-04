@@ -51,7 +51,7 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
         if i == nbr_hosts-1:
             rec_par_hote=last_host
         command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote}"
-        t=threading.Thread(target=run,args=(hosts[i],usernames[i],"bakati", [command]))
+        t=threading.Thread(target=run,args=(hosts[i],usernames[i],"", [command]))
         threads.append(t)
         threads[i].start()
     # run(hosts[0],usernames[0],"bakati",
