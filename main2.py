@@ -48,8 +48,10 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
     #for i in range(nmbre_rec):
      #   print(f"host {hosts[i%(len(hosts))]} user: {usernames[i%(len(hosts))]}")
     for i in range(nbr_hosts):
+        if i == nbr_hosts-1:
+            rec_par_hote=last_host
         command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote}"
-        t=threading.Thread(target=run,args=(hosts[i],usernames[i],"", [command]))
+        t=threading.Thread(target=run,args=(hosts[i],usernames[i],"bakati", [command]))
         threads.append(t)
         threads[i].start()
     # run(hosts[0],usernames[0],"bakati",
@@ -57,7 +59,6 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
     start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
                             device, ivybus_test_manager)
     
-    # run("vm-twr0-1-bakati.achil.recherche.enac.fr","mohammed","bakati",["python3 Documents/dev/comparaison_middleware_multi_machine/main.py --protocol ivy --port 10.34.127.255:2421 --length 10 --message_count 10 --nbr_receivers 3 --send"])
     # for proc in recv_procs:
     #     proc.join()
 
