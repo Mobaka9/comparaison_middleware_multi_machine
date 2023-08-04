@@ -30,32 +30,34 @@ def start_sender_and_wait(protocol, message_count, port, length, sleep, flag_cou
 def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_msg, device,
          sleep, ivybus_test_manager, hosts, usernames):
     threads = []
-    if len(hosts) > len(usernames):
+    if len(usernames)==1:
+        usernames = usernames*len(hosts)
+    elif len(hosts) > len(usernames):
         print("nombre de usernames insuffisant")
         return
     elif len(hosts) < len(usernames):
         print("nombre de hosts insuffisant")
         return
-    logging.info('Démarrage du programme')
-    if nmbre_rec > len(hosts):
-        rec_par_hote= int(nmbre_rec/len(hosts))
-        last_host = rec_par_hote + (nmbre_rec%len(hosts))
-        nbr_hosts=len(hosts)
-    else:
-        nbr_hosts= nmbre_rec
-        rec_par_hote=1
     
-    #for i in range(nmbre_rec):
-     #   print(f"host {hosts[i%(len(hosts))]} user: {usernames[i%(len(hosts))]}")
-    for i in range(nbr_hosts):
-        if i == nbr_hosts-1:
-            rec_par_hote=last_host
+    logging.info('Démarrage du programme')
+    
+    # if nmbre_rec > len(hosts):
+    #     rec_par_hote= int(nmbre_rec/len(hosts))
+    #     last_host = rec_par_hote + (nmbre_rec%len(hosts))
+    #     nbr_hosts=len(hosts)
+    # else:
+    #     nbr_hosts= nmbre_rec
+    #     rec_par_hote=1
+    
+    
+    runs = [x % len(hosts) for x in range(nmbre_rec)]
+        
+    for i in range(len(hosts)):
+        rec_par_hote = runs.count(i)
         command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote}"
-        t=threading.Thread(target=run,args=(hosts[i],usernames[i],"", [command]))
+        t=threading.Thread(target=run,args=(hosts[i],usernames[i],None, [command]))
         threads.append(t)
         threads[i].start()
-    # run(hosts[0],usernames[0],"bakati",
-    #     [f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol ivy --port 10.34.127.255:3322 --message_count 10 --nbr_receivers 3"])
     start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
                             device, ivybus_test_manager)
     
@@ -82,8 +84,8 @@ if __name__ == '__main__':
     parser.add_argument('--direct_msg', action='store_true', help="envoyer des messages ivy avec ivydirectmsg")
     parser.add_argument('--device', default=None, help='nom du peripherique réseau utilisé pour ingescape')
     parser.add_argument('--ivybus_test_manager', default='10.34.127.255:1111', help='ivy bus pour la synchro des tests')
-    parser.add_argument('--hosts', nargs='+', help='la liste des hotes qui vont lancer les receveurs', required=True)
-    parser.add_argument('-u','--usernames', nargs='+', help='la liste des username qui vont lancer les receveurs', required=True)
+    parser.add_argument('--hosts', nargs='+', help='la liste des hotes qui vont lancer les receveurs')
+    parser.add_argument('--usernames',nargs='+', default=["achil"], help='la liste des username qui vont lancer les receveurs')
     param = parser.parse_args()
 
     # Configurer la journalisation
