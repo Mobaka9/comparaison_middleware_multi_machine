@@ -54,7 +54,7 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
         
     for i in range(len(hosts)):
         rec_par_hote = runs.count(i)
-        command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote}"
+        command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote} --ivybus_test_manager {ivybus_test_manager}"
         t=threading.Thread(target=run,args=(hosts[i],usernames[i],None, [command]))
         threads.append(t)
         threads[i].start()
