@@ -111,6 +111,8 @@ class IvyProtocol(AbstractProtocol):
                                    "duration": (t1 - data),
                                    "recv_id": self.client_id
                                    })
+        
+        print(f"hey {self.durations}")
         logging.error(f"client {self.client_id} message #{self.last_received_msg_id} received at {t1}")
         self.last_received_msg_id += 1
 

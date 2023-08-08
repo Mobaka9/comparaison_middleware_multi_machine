@@ -58,11 +58,17 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     print("envoi termine")
 
     results = protocol_obj.wait_for_all_results(nbr_receivers)
-
+    
     write_csv_results(results)
 
     protocol_obj.stopsocket()
+    print(f"-------------{results}")
 
+    temps_totaux=[]
+    for i in range(nbr_receivers):
+        print(f"fnr{i}")
+        temps_totaux.append((results[0][i][-1]["end_time"]) - (results[0][i][0]["start_time"]))
+        
 
 def generate_message_load(flag_count, length):
     length_of_string = int(length)
