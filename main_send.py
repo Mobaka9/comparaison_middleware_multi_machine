@@ -47,11 +47,11 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     logging.error("ALL RECEIVERS READY !")
 
     message_rand = generate_message_load(flag_count, length)
-
+    t1=time.time()
     for i in range(message_count):
         start_time = time.time()
         message = str(message_rand) + str(start_time)
-        logging.warning(f"Message #{i} sent.")
+        #logging.warning(f"Message #{i} sent.")
         protocol_obj.send_message(message)
         sleep(sender_sleep_duration)
 
@@ -62,12 +62,12 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     write_csv_results(results)
 
     protocol_obj.stopsocket()
-    print(f"-------------{results}")
+    print(f"-------------{time.time()-t1}")
 
     temps_totaux=[]
     for i in range(nbr_receivers):
         print(f"fnr{i}")
-        temps_totaux.append((results[0][i][-1]["end_time"]) - (results[0][i][0]["start_time"]))
+        temps_totaux.append((results[i][-1]["end_time"]) - (results[i][0]["start_time"]))
         
 
 def generate_message_load(flag_count, length):
