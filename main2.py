@@ -55,7 +55,7 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
     for i in range(len(hosts)):
         rec_par_hote = runs.count(i)
         command = f"python3 Documents/comparaison_middleware_multi_machine/main.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote} --ivybus_test_manager {ivybus_test_manager}"
-        t=threading.Thread(target=run,args=(hosts[i],usernames[i],None, [command]))
+        t=threading.Thread(target=run,args=(hosts[i],usernames[i], "1ihm-demo", [command]))
         threads.append(t)
         threads[i].start()
     start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
@@ -67,7 +67,7 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
     
         
 
-    logging.info('Fin du programme')
+    #logging.info('Fin du programme')
 
 
 if __name__ == '__main__':
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('--nbr_receivers', default=1, type=int, help='Nombre de receveurs créés')
     parser.add_argument('--direct_msg', action='store_true', help="envoyer des messages ivy avec ivydirectmsg")
     parser.add_argument('--device', default=None, help='nom du peripherique réseau utilisé pour ingescape')
-    parser.add_argument('--ivybus_test_manager', default='10.34.127.255:1111', help='ivy bus pour la synchro des tests')
+    parser.add_argument('--ivybus_test_manager', default='10.34.127.255:1110', help='ivy bus pour la synchro des tests')
     parser.add_argument('--hosts', nargs='+', help='la liste des hotes qui vont lancer les receveurs')
     parser.add_argument('--usernames',nargs='+', default=["achil"], help='la liste des username qui vont lancer les receveurs')
     param = parser.parse_args()

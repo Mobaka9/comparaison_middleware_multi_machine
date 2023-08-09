@@ -83,6 +83,7 @@ class AbstractProtocol(ABC):
 
     def wait_for_all_results(self, count):
         while self.results_received != count:
+            print(self.results_received)
             print(f"Sender wait for results: {len(self.results)}")
             sleep(0.1)
         return self.results
