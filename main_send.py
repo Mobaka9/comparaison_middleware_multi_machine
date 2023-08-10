@@ -50,7 +50,7 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     t1=time.time()
     for i in range(message_count):
         start_time = time.time()
-        message = str(message_rand) + str(start_time)
+        message = "welcome"+str(message_rand) + str(start_time)
         #logging.warning(f"Message #{i} sent.")
         protocol_obj.send_message(message)
         sleep(sender_sleep_duration)

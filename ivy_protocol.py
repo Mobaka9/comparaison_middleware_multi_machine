@@ -133,8 +133,8 @@ class IvyProtocol(AbstractProtocol):
             regexp = ' '.join(f"flag{i}=(\\S*)" for i in range(flag_count)) + " start_time=(\\S*)"
             self.ivybus.bind_msg(self.onmsgproc2, regexp)
         else:
-            self.ivybus.bind_msg(self.onmsgprocbind, '(.*)')
-            #self.ivybus.bind_msg(self.onmsgprocbind, 'bonjour(.*)')
+            self.ivybus.bind_msg(self.onmsgprocbind, 'welcome(.*)')
+            self.ivybus.bind_msg(self.onmsgprocbind, 'bonjour(.*)')
         self.send_ready_message()
 
         # sleep(2)
