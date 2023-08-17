@@ -3,6 +3,9 @@ import logging
 import multiprocessing
 from main_send import main_send
 from main_receive import main_receive
+from pypdsh.pypdsh import run
+import threading
+
 
 
 def start_receivers(protocol, message_count, port, regexp_match_count, nmbre_rec, ivybus_test_manager):
@@ -25,10 +28,9 @@ def start_sender_and_wait(protocol, message_count, port, length, sleep, flag_cou
 
 
 def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_msg, device,
-         sleep, send_only, receive_only, ivybus_test_manager):
+         sleep, ivybus_test_manager, hosts, usernames, receive_only, send_only, local):
     logging.info('Démarrage du programme')
-
-    if not send_only and not receive_only:
+    if local:
         recv_procs = start_receivers(protocol, message_count, port, flag_count,
                                      nmbre_rec, ivybus_test_manager)
         start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
@@ -45,8 +47,30 @@ def main(nmbre_rec, protocol, message_count, port, length, flag_count, direct_ms
     elif send_only:
         start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
                               device, ivybus_test_manager)
+    else: 
+        threads = []
+        if len(usernames)==1:
+            usernames = usernames*len(hosts)
+        elif len(hosts) > len(usernames):
+            print("nombre de usernames insuffisant")
+            return
+        elif len(hosts) < len(usernames):
+            print("nombre de hosts insuffisant")
+            return
+    
+        runs = [x % len(hosts) for x in range(nmbre_rec)]
+            
+        for i in range(len(hosts)):
+            rec_par_hote = runs.count(i)
+            command = f"python3 Documents/comparaison_middleware_multi_machine/main2.py --receive --protocol {protocol} --port {port} --message_count {message_count} --nbr_receivers {rec_par_hote} --ivybus_test_manager {ivybus_test_manager}"
+            t=threading.Thread(target=run,args=(hosts[i],usernames[i], "1ihm-demo", [command]))    #creation de thread pour chaque machine
+            threads.append(t)
+            threads[i].start()
+        start_sender_and_wait(protocol, message_count, port, length, sleep, flag_count, nmbre_rec,
+                                device, ivybus_test_manager)
+        
 
-    logging.info('Fin du programme')
+    #logging.info('Fin du programme')
 
 
 if __name__ == '__main__':
@@ -59,12 +83,17 @@ if __name__ == '__main__':
     parser.add_argument('--sleep', default='0', type=float,
                         help="Temps du sleep à mettre entre l'envoi de chaque message")
     parser.add_argument('--flag_count', default=0, type=int, help='Nombre de flags à envoyer')
-    parser.add_argument('--receive', action='store_true', help="executer en tant que receveur")
-    parser.add_argument('--send', action='store_true', help="executer en tant que sender")
     parser.add_argument('--nbr_receivers', default=1, type=int, help='Nombre de receveurs créés')
     parser.add_argument('--direct_msg', action='store_true', help="envoyer des messages ivy avec ivydirectmsg")
     parser.add_argument('--device', default=None, help='nom du peripherique réseau utilisé pour ingescape')
-    parser.add_argument('--ivybus_test_manager', default='10.34.127.255:1111', help='ivy bus pour la synchro des tests')
+    parser.add_argument('--ivybus_test_manager', default='10.34.127.255:1110', help='ivy bus pour la synchro des tests')
+    parser.add_argument('--hosts', nargs='+', help='la liste des hotes qui vont lancer les receveurs')
+    parser.add_argument('--usernames',nargs='+', default=["achil"], help='la liste des username qui vont lancer les receveurs')
+    parser.add_argument('--receive', action='store_true', help="executer en tant que receveur")
+    parser.add_argument('--send', action='store_true', help="executer en tant que sender")
+    parser.add_argument('--local', action='store_true', help="executer le sender et le receveur dans la même machine")
+
+
     param = parser.parse_args()
 
     # Configurer la journalisation
@@ -86,7 +115,9 @@ if __name__ == '__main__':
          direct_msg=param.direct_msg,
          device=param.device,
          sleep=param.sleep,
-         send_only=param.send,
+         ivybus_test_manager=param.ivybus_test_manager,
+         hosts=param.hosts,
+         usernames=param.usernames,
          receive_only=param.receive,
-         ivybus_test_manager=param.ivybus_test_manager
-         )
+         send_only=param.send,
+         local=param.local)
