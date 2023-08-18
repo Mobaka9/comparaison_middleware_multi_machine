@@ -17,17 +17,12 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     com = "PUB"
     if protocol == 'ivy':
         args = port
-        # if direct_msg:
-        #     protocol_obj = IvyDirectProtocol(args, port, com, ivybus_test_manager)
-        #     protocol_obj.initialize()
-        # else:
-        # TODO : le main_receive ne gère pas le cas IvyDirect
+
         protocol_obj = IvyProtocol(port, com, 'send', ivybus_test_manager)
         protocol_obj.initialize()
 
     elif protocol == 'zeromq':
         port = int(port)
-        # port+=1
         protocol_obj = ZeroMQProtocol(port, com, 'send', ivybus_test_manager)
         protocol_obj.initialize()
     # elif protocol == 'kafka':
@@ -47,7 +42,6 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     logging.error("ALL RECEIVERS READY !")
 
     message_rand = generate_message_load(flag_count, length)
-    t1=time.time()
     for i in range(message_count):
         start_time = time.time()
         message = "welcome"+str(message_rand) + str(start_time)
@@ -58,18 +52,14 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
     print("envoi termine")
 
     results = protocol_obj.wait_for_all_results(nbr_receivers)
-    t2=time.time()
-    print(f"------------- {t2-t1}")
-    #write_csv_results(results)
+    write_csv_results(results)
 
     protocol_obj.stopsocket()
     
     sleep(5)
-    print(f"------------- {t2-t1}")
 
     # temps_totaux=[]
     # for i in range(nbr_receivers):
-    #     print(f"fnr{i}")
     #     temps_totaux.append((results[i][-1]["end_time"]) - (results[i][0]["start_time"]))
         
 

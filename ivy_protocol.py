@@ -96,10 +96,7 @@ class IvyProtocol(AbstractProtocol):
     def onmsgprocready(self, agent, *larg):
         pass
 
-    #     print(larg[0])
-    #     str_ready = "RECEIVER_READY "+str(agent)
-    #     print(f"test entre {str_ready}" )
-    #     self.queue.put(str_ready)
+
 
     def onmsgprocbind(self, agent, *larg):
         # self.lprint('Received from %r: [%s] ', agent, larg[1])
@@ -112,7 +109,6 @@ class IvyProtocol(AbstractProtocol):
                                    "recv_id": self.client_id
                                    })
         
-        # print(f"hey {self.durations}")
         # logging.error(f"client {self.client_id} message #{self.last_received_msg_id} received at {t1}")
         self.last_received_msg_id += 1
 
@@ -141,9 +137,7 @@ class IvyProtocol(AbstractProtocol):
 
         while len(self.durations) != message_count:
             pass
-            # print(self.plt_data)
-        # if self.pop_hello:
-        #     self.plt_data= self.plt_data[total_rec:]
+
         return self.durations
 
     def stopsocket(self):
