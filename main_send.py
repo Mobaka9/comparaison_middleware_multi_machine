@@ -56,7 +56,6 @@ def main_send(protocol, message_count, port, length, sender_sleep_duration, flag
 
     protocol_obj.stopsocket()
     
-    sleep(5)
 
     # temps_totaux=[]
     # for i in range(nbr_receivers):
